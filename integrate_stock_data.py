@@ -4,10 +4,11 @@
 @Author: HollisYu
 @Date: 2019-10-19 12:44:35
 @LastEditors: HollisYu
-@LastEditTime: 2019-10-22 18:36:34
+@LastEditTime: 2019-10-28 21:44:50
 '''
 # -*- coding:utf-8 -*-
 import pandas as pd
+import numpy as np
 import os
 
 # basic file settings
@@ -19,7 +20,7 @@ if not os.path.exists(result_path):
 # data settings
 data_header = ["SecurityID", "DateTime", "PreClosePx", "OpenPx", "HighPx", "LowPx", "LastPx", "Volume", "Amount", "IOPV", "fp_Volume", "fp_Amount"]
 
-csv_data = pd.read_csv(file_path + "20140102_Day.csv")
+csv_data = pd.read_csv(file_path + "20140102_Day.csv", parse_dates=['DateTime'])
 id_list = list(csv_data["SecurityID"])
 
 file_list = os.listdir(file_path)
@@ -27,7 +28,7 @@ file_list.sort()
 for stock_id in id_list:
     one_stock_data = pd.DataFrame(columns=data_header)
     for f in file_list:
-        csv_data = pd.read_csv(file_path + f)
+        csv_data = pd.read_csv(file_path + f, parse_dates=['DateTime'])
         csv_data.set_index("SecurityID", drop=False, inplace=True)
         if stock_id in csv_data.index:
             line = csv_data.loc[stock_id]
