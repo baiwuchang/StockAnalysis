@@ -1,0 +1,50 @@
+# -*- coding:utf-8 -*-
+'''
+@Description: 
+@Version: 1.0
+@Author: HollisYu
+@Date: 2019-11-11 09:59:56
+@LastEditors: HollisYu
+@LastEditTime: 2019-11-11 11:00:27
+'''
+class Stock:
+    def __init__(self, stock_id: str, buying_price: float, shares: float):
+        self.stock_id = stock_id  # stock id
+
+        self.buying_price = buying_price  # stock buying price for each shares
+        self.shares = shares  # stock holding shares
+        self.total_cost = self.buying_price * self.shares  # stock total buying cost, equal to buying_price * shares
+
+        self.now_price = buying_price  # stock now price, change everyday
+        self.total_value = self.total_cost  # stock now value, equal to now_price * shares
+
+    def buy(self, buying_price: float, shares: float) -> float:
+        self.shares += shares
+        self.now_price = buying_price
+
+        total_cost = shares * buying_price
+        self.total_cost += total_cost
+        self.buying_price = self.total_cost / self.shares
+        
+        self.total_value = self.shares * self.now_price
+
+        return total_cost
+
+    def sell(self, selling_price: float, shares: float =self.shares) -> float:  
+        if shares > self.shares:
+            return 0
+            
+        self.shares -= shares
+        self.now_price = selling_price
+        
+        total_value = shares * selling_price
+        if self.shares != 0:
+            self.total_cost -= total_value
+            self.buying_price = self.total_cost / self.shares
+            self.total_value = self.shares * self.now_price
+        else:
+            self.total_cost = 0
+            self.buying_price = 0
+            self.total_value = 0
+
+        return total_value
