@@ -5,7 +5,7 @@
 @Author: HollisYu
 @Date: 2019-11-11 09:59:56
 @LastEditors: HollisYu
-@LastEditTime: 2019-11-11 11:00:27
+@LastEditTime: 2019-11-13 15:42:43
 '''
 class Stock:
     def __init__(self, stock_id: str, buying_price: float, shares: float):
@@ -18,7 +18,7 @@ class Stock:
         self.now_price = buying_price  # stock now price, change everyday
         self.total_value = self.total_cost  # stock now value, equal to now_price * shares
 
-    def buy(self, buying_price: float, shares: float) -> float:
+    def buy(self, buying_price: float, shares: float):
         self.shares += shares
         self.now_price = buying_price
 
@@ -28,12 +28,7 @@ class Stock:
         
         self.total_value = self.shares * self.now_price
 
-        return total_cost
-
-    def sell(self, selling_price: float, shares: float =self.shares) -> float:  
-        if shares > self.shares:
-            return 0
-            
+    def sell(self, selling_price: float, shares: float):  
         self.shares -= shares
         self.now_price = selling_price
         
@@ -46,5 +41,3 @@ class Stock:
             self.total_cost = 0
             self.buying_price = 0
             self.total_value = 0
-
-        return total_value
