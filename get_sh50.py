@@ -5,7 +5,7 @@
 @Author: HollisYu
 @Date: 2019-11-20 14:31:27
 @LastEditors: HollisYu
-@LastEditTime: 2019-11-21 00:34:02
+@LastEditTime: 2019-11-21 19:39:05
 '''
 import pandas as pd
 import os
@@ -34,5 +34,8 @@ with open("F:/Programming/Dataset/StockInformation/index_cons.txt") as f:
 
 for key, value in res.items():
     with open("./sh_50/" + key + ".txt", 'w') as f:
-        print(key + " length: " + str(len(value)))
-        f.write(str(value))
+        # print(key + " length: " + str(len(value)))
+        write_down = str(value)[1:-1]
+        write_down = write_down.replace('\'', '')
+        write_down = write_down.replace(' ', '')
+        f.write(write_down)
