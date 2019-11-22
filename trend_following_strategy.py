@@ -5,7 +5,7 @@
 @Author: HollisYu
 @Date: 2019-11-13 14:02:47
 @LastEditors: HollisYu
-@LastEditTime: 2019-11-22 00:22:07
+@LastEditTime: 2019-11-22 10:23:27
 '''
 import pandas as pd
 import numpy as np
@@ -122,11 +122,10 @@ def strategy(account, start_date, end_date):
                             # if already have 10 stocks, stop buying
                             if len(account.buy_in_stocks) >= 10:
                                 break
-        print("DateTime: {}, TotalMoney: {}, Cash: {}".format(date.strftime("%Y-%m-%d"), account.total_value, account.money))
-        # record = pd.DataFrame([[date.strftime("%Y-%m-%d"), account.total_value, account.money, account.total_value - account.money]], columns=['DateTime', 'TotalMoney', 'Cash', 'Stocks'])
-        # record = pd.Series({'DateTime': date.strftime("%Y-%m-%d"), 'TotalMoney': account.total_value, 'Cash':account.money, 'Stocks': account.total_value - account.money})
+        # print("DateTime: {}, TotalMoney: {}, Cash: {}".format(date.strftime("%Y-%m-%d"), account.total_value, account.money))
         # record account money change and buy-sell records
-        # money_records.append(record, ignore_index=True)
+        record = pd.DataFrame([[date.strftime("%Y-%m-%d"), account.total_value, account.money, account.total_value - account.money]], columns=['DateTime', 'TotalMoney', 'Cash', 'Stocks'])
+        money_records = money_records.append(record, ignore_index=True)
         # add one day
         date += datetime.timedelta(days=1)
     
