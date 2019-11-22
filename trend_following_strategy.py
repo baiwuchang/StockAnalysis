@@ -5,15 +5,20 @@
 @Author: HollisYu
 @Date: 2019-11-13 14:02:47
 @LastEditors: HollisYu
-@LastEditTime: 2019-11-22 10:23:27
+@LastEditTime: 2019-11-22 20:39:23
 '''
 import pandas as pd
 import numpy as np
 import datetime
 import os
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 # local
 import stock
 import user
+
+mpl.rcParams['font.family'] = 'sans-serif'
+mpl.rcParams['font.sans-serif'] = 'SimHei'
 
 def get_sh50_info(date: str) -> list:
     file_path = "./sh_50/"
@@ -60,6 +65,7 @@ def strategy(account, start_date, end_date):
         if date.weekday() < 5:  # if it's Saturday or Sunday, skip
             # get sh_50 stocks
             sh_50 = get_sh50_info(date.strftime("%Y%m%d"))
+            dt = date.strftime("%Y-%m-%d")
             
             if sh_50:   # if no sh_50 data, maybe a holiday, skip
                 # first sell stocks which are down, also update prices
@@ -73,7 +79,6 @@ def strategy(account, start_date, end_date):
                     stock_data = pd.read_csv(file_name)
                     stock_data.set_index('DateTime', drop=False, inplace=True)
                     # get today data line
-                    dt = date.strftime("%Y-%m-%d")
                     # if data not exists, skip
                     if dt not in stock_data.index:
                         continue
@@ -90,6 +95,7 @@ def strategy(account, start_date, end_date):
                 # get all selling stocks and then sell them
                 for stock_id in temp_sell:
                     account.sell_stock(stock_id)
+                    print("Sell stock: {} on {}".format(stock_id, dt))
 
                 # check if there have place to buy stocks
                 if len(account.buy_in_stocks) < 10:
@@ -106,7 +112,6 @@ def strategy(account, start_date, end_date):
                         stock_data = pd.read_csv(file_name)
                         stock_data.set_index('DateTime', drop=False, inplace=True)
                         # get today data line
-                        dt = date.strftime("%Y-%m-%d")
                         # if data not exists, skip
                         if dt not in stock_data.index:
                             continue
@@ -118,23 +123,34 @@ def strategy(account, start_date, end_date):
                             # buy no more than threshold or money have
                             money = min(account.up_threshold, account.money)
                             account.buy_stock(stock_id, today_data['LastPx'], money)
+                            print("Buy stock: {} on {}".format(stock_id, dt))
 
                             # if already have 10 stocks, stop buying
                             if len(account.buy_in_stocks) >= 10:
                                 break
-        # print("DateTime: {}, TotalMoney: {}, Cash: {}".format(date.strftime("%Y-%m-%d"), account.total_value, account.money))
         # record account money change and buy-sell records
         record = pd.DataFrame([[date.strftime("%Y-%m-%d"), account.total_value, account.money, account.total_value - account.money]], columns=['DateTime', 'TotalMoney', 'Cash', 'Stocks'])
         money_records = money_records.append(record, ignore_index=True)
         # add one day
         date += datetime.timedelta(days=1)
     
-    print(money_records)
+    # print(money_records)
     return money_records
 
 if __name__ == '__main__':
     my_account = user.User(200000.0)
     start_date = datetime.datetime.strptime("20140302", '%Y%m%d')
-    end_date = datetime.datetime.strptime("20151231", '%Y%m%d')
+    end_date = datetime.datetime.strptime("20141231", '%Y%m%d')
     result = strategy(my_account, start_date, end_date)
 
+    fig, ax = plt.subplots()
+    for label in ['TotalMoney', 'Cash', 'Stocks']: 
+        ax.plot(result[label], label=label)
+
+    ax.set_title('趋势跟随策略下的账户变化', fontsize=20)
+    ax.set_xlabel('交易日期')
+    ax.set_xticklabels(result['DateTime'][::10], rotation=45)
+    ax.set_ylabel('金额(元)')
+    ax.legend(loc='upper left')
+    ax.grid(True)
+    plt.show()
