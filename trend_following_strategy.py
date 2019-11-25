@@ -5,7 +5,7 @@
 @Author: HollisYu
 @Date: 2019-11-13 14:02:47
 @LastEditors: HollisYu
-@LastEditTime: 2019-11-25 16:31:38
+@LastEditTime: 2019-11-22 20:39:23
 '''
 import pandas as pd
 import numpy as np
@@ -16,9 +16,15 @@ import matplotlib.pyplot as plt
 # local
 import stock
 import user
+from numpy import loadtxt
 
 mpl.rcParams['font.family'] = 'sans-serif'
 mpl.rcParams['font.sans-serif'] = 'SimHei'
+
+stock_set = loadtxt('all_sh50.txt', delimiter = ",")
+stock_set = list(stock_set)
+for i in range(len(stock_set)):
+    stock_set[i] = str((int(stock_set[i])))
 
 def get_sh50_info(date: str) -> list:
     file_path = "./sh_50/"
@@ -56,10 +62,17 @@ def check(stock_id: str, day_data, op_type: str) -> bool:
 
 
 def strategy(account, start_date, end_date):
+    #画甘特图需要的
+    gantt_data = []
+    gantt_data_everyday = [0] * 97 #某天是否持有某个股票
+    #画甘特图需要的-结束
+
     date = start_date
     sh_50 = []
     file_path = "./sh1_each_stock_data/"
     money_records = pd.DataFrame(columns=['DateTime', 'TotalMoney', 'Cash', 'Stocks'])
+    stock_records = pd.DataFrame(columns=['DateTime'] + stock_set)
+
     
     while date <= end_date:
         if date.weekday() < 5:  # if it's Saturday or Sunday, skip
@@ -91,6 +104,7 @@ def strategy(account, start_date, end_date):
                     # stock down, sell all
                     if sell_flag:
                         temp_sell.append(stock_id)
+                        gantt_data_everyday[stock_set.index(stock_id)] = 0 #甘特图需要
                     
                 # get all selling stocks and then sell them
                 for stock_id in temp_sell:
@@ -125,28 +139,31 @@ def strategy(account, start_date, end_date):
                             account.buy_stock(stock_id, today_data['LastPx'], money)
                             print("Buy stock: {} on {}".format(stock_id, dt))
 
+                            gantt_data_everyday[stock_set.index(stock_id)] = 1 #甘特图需要
+
                             # if already have 10 stocks, stop buying
                             if len(account.buy_in_stocks) >= 10:
                                 break
         # record account money change and buy-sell records
         record = pd.DataFrame([[date.strftime("%Y-%m-%d"), account.total_value, account.money, account.total_value - account.money]], columns=['DateTime', 'TotalMoney', 'Cash', 'Stocks'])
         money_records = money_records.append(record, ignore_index=True)
+        record_for_gantt = pd.DataFrame([[date.strftime("%Y-%m-%d")] + gantt_data_everyday], columns=['DateTime'] + stock_set)
+        stock_records = stock_records.append(record_for_gantt, ignore_index = True)
         # add one day
         date += datetime.timedelta(days=1)
     
-    # print(money_records)
-    return money_records
+    return money_records, stock_records
 
 if __name__ == '__main__':
     my_account = user.User(200000.0)
-    start_date = datetime.datetime.strptime("20190101", '%Y%m%d')
-    end_date = datetime.datetime.strptime("20190930", '%Y%m%d')
-    result = strategy(my_account, start_date, end_date)
+    start_date = datetime.datetime.strptime("20140302", '%Y%m%d')
+    end_date = datetime.datetime.strptime("20141020", '%Y%m%d')
+    result, stock_records = strategy(my_account, start_date, end_date)
 
+    #画账户变化图
     fig, ax = plt.subplots()
     for label in ['TotalMoney', 'Cash', 'Stocks']: 
         ax.plot(result[label], label=label)
-
     ax.set_title('趋势跟随策略下的账户变化', fontsize=20)
     ax.set_xlabel('交易日期')
     ax.set_xticks(range(0, len(result['DateTime']), 10))
@@ -154,4 +171,37 @@ if __name__ == '__main__':
     ax.set_ylabel('金额(元)')
     ax.legend(loc='upper left')
     ax.grid(True)
+
+
+    
+    #先把没买过的的股票删掉
+    for i in reversed(range(len(stock_set))):
+        delete_flag = 1
+        for j in range(len(stock_records.values)):
+            if stock_records.values[j][i+1]:
+                delete_flag = 0
+                break
+        if delete_flag == 1:
+            id = stock_set[i]
+            del(stock_set[i])
+            stock_records.drop([id],axis=1,inplace=True)
+
+    #画各股票持仓甘特图
+    plt.figure(1) #另一幅图
+    fig2, ax2 = plt.subplots()
+    plt.plot(len(stock_records.values), len(stock_set)) #设置坐标轴刻度范围
+    for i in range(len(stock_records.values)): #当天持有该股票的话画个点
+        for j in range(len(stock_set)):
+            if stock_records.values[i][j] == 1:
+                ax2.scatter(i,j,s = 10, c = 'r')
+    
+    ax2.set_title('趋势跟随策略下的股票持仓变化', fontsize=20)
+    ax2.set_xlabel('交易日期')
+    ax2.set_xticks(range(0, len(result['DateTime']), 10)) #显示坐标轴日期用的
+    ax2.set_xticklabels(result['DateTime'][::10], rotation=45)
+    plt.yticks(range(len(stock_set)),stock_set)
+    ax2.set_ylabel('股票代码')
+
     plt.show()
+
+    
