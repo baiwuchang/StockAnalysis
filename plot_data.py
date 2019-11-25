@@ -3,7 +3,7 @@
 @Author: HollisYu
 @Date: 2019-10-19 10:55:15
 @LastEditors: HollisYu
-@LastEditTime: 2019-11-11 10:53:59
+@LastEditTime: 2019-11-25 15:41:38
 '''
 # -*- coding:utf-8 -*-
 import pandas as pd
@@ -15,13 +15,13 @@ mpl.rcParams['font.family'] = 'sans-serif'
 mpl.rcParams['font.sans-serif'] = 'SimHei'
 pd.set_option('display.float_format',lambda x : '%.3f' % x)
 
-data_file = "F:/Programming/Dataset/StockInformation/sh1_each_stock_data/ID_1_Day.csv"
+data_file = "./sh1_each_stock_data/ID_1_Day.csv"
 csv_data = pd.read_csv(data_file)
 
 # Cal average means
-csv_data['Mean5'] = csv_data.LastPx.rolling(5).mean()
-csv_data['Mean10'] = csv_data.LastPx.rolling(10).mean()
-csv_data['Mean30'] = csv_data.LastPx.rolling(30).mean()
+# csv_data['Mean5'] = csv_data.LastPx.rolling(5).mean()
+# csv_data['Mean10'] = csv_data.LastPx.rolling(10).mean()
+# csv_data['Mean30'] = csv_data.LastPx.rolling(30).mean()
 
 # Control the subplots
 figure = plt.figure(figsize=(16, 9))

@@ -5,7 +5,7 @@
 @Author: HollisYu
 @Date: 2019-11-13 14:02:47
 @LastEditors: HollisYu
-@LastEditTime: 2019-11-22 20:39:23
+@LastEditTime: 2019-11-25 16:31:38
 '''
 import pandas as pd
 import numpy as np
@@ -139,8 +139,8 @@ def strategy(account, start_date, end_date):
 
 if __name__ == '__main__':
     my_account = user.User(200000.0)
-    start_date = datetime.datetime.strptime("20140302", '%Y%m%d')
-    end_date = datetime.datetime.strptime("20141231", '%Y%m%d')
+    start_date = datetime.datetime.strptime("20190101", '%Y%m%d')
+    end_date = datetime.datetime.strptime("20190930", '%Y%m%d')
     result = strategy(my_account, start_date, end_date)
 
     fig, ax = plt.subplots()
@@ -149,6 +149,7 @@ if __name__ == '__main__':
 
     ax.set_title('趋势跟随策略下的账户变化', fontsize=20)
     ax.set_xlabel('交易日期')
+    ax.set_xticks(range(0, len(result['DateTime']), 10))
     ax.set_xticklabels(result['DateTime'][::10], rotation=45)
     ax.set_ylabel('金额(元)')
     ax.legend(loc='upper left')
