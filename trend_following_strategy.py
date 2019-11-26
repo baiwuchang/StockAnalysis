@@ -5,21 +5,21 @@
 @Author: HollisYu
 @Date: 2019-11-13 14:02:47
 @LastEditors: HollisYu
-@LastEditTime: 2019-11-22 20:39:23
+@LastEditTime: 2019-11-26 23:00:50
 '''
 import pandas as pd
 import numpy as np
 import datetime
 import os
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 # local
 import stock
 import user
 from numpy import loadtxt
 
-mpl.rcParams['font.family'] = 'sans-serif'
-mpl.rcParams['font.sans-serif'] = 'SimHei'
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.sans-serif'] = 'SimHei'
+plt.rcParams['axes.unicode_minus']=False
 
 stock_set = loadtxt('all_sh50.txt', delimiter = ",")
 stock_set = list(stock_set)
@@ -48,14 +48,16 @@ def check(stock_id: str, day_data, op_type: str) -> bool:
 
     # if is selling
     if op_type == "sell":
-        if day_data['Mean10'] <= day_data['Mean30'] and day_data['Mean5'] < day_data['Mean30']:
+        # if day_data['Mean10'] <= day_data['Mean30'] and day_data['Mean5'] < day_data['Mean30']:
+        if day_data['DIF'] <= day_data['DEA'] and day_data['DIF'] < 0 and day_data['DEA'] < 0:
             return True
         else:
             return False
 
     #if is buying
     else:
-        if day_data['Mean10'] >= day_data['Mean30'] and day_data['Mean5'] > day_data['Mean30']:
+        # if day_data['Mean10'] >= day_data['Mean30'] and day_data['Mean5'] > day_data['Mean30']:
+        if day_data['DIF'] >= day_data['DEA'] and day_data['DIF'] > 0 and day_data['DEA'] > 0:
             return True
         else:
             return False
@@ -157,7 +159,7 @@ def strategy(account, start_date, end_date):
 if __name__ == '__main__':
     my_account = user.User(200000.0)
     start_date = datetime.datetime.strptime("20140302", '%Y%m%d')
-    end_date = datetime.datetime.strptime("20141020", '%Y%m%d')
+    end_date = datetime.datetime.strptime("20141231", '%Y%m%d')
     result, stock_records = strategy(my_account, start_date, end_date)
 
     #画账户变化图

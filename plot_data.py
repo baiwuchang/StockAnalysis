@@ -3,16 +3,17 @@
 @Author: HollisYu
 @Date: 2019-10-19 10:55:15
 @LastEditors: HollisYu
-@LastEditTime: 2019-11-25 15:41:38
+@LastEditTime: 2019-11-26 23:16:19
 '''
 # -*- coding:utf-8 -*-
 import pandas as pd
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import mpl_finance as mpf
 
-mpl.rcParams['font.family'] = 'sans-serif'
-mpl.rcParams['font.sans-serif'] = 'SimHei'
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.sans-serif'] = 'SimHei'
+plt.rcParams['axes.unicode_minus'] = False
+
 pd.set_option('display.float_format',lambda x : '%.3f' % x)
 
 data_file = "./sh1_each_stock_data/ID_1_Day.csv"
@@ -47,6 +48,22 @@ ax2.set_xticklabels(csv_data['DateTime'][::10], rotation=45)
 ax2.grid(True)
 ax2.set_ylabel('成交量')
 ax2.set_ylim(ymin=0)
+
+# plot MACD
+fig3, ax3 = plt.subplots()
+ax3.plot(csv_data['DIF'], label='DIF')
+ax3.plot(csv_data['DEA'], label='DEA')
+
+ax4 = ax3.twinx()
+ax4.bar(csv_data.shape[0], csv_data['MACD'].values, width=0.3, color=['r' if csv_data.MACD[x] > 0 else 'g' for x in range(csv_data.shape[0])])
+
+ax3.legend(loc='upper left')
+ax3.grid(True)
+ax3.set_title('股票MACD走势', fontsize=20)
+ax3.set_xlabel('交易日期')
+ax3.set_xticks(range(0, len(csv_data['DateTime']), 10))
+ax3.set_xticklabels(csv_data['DateTime'][::10], rotation=45)
+ax3.set_ylabel('MACD')
 
 # show the result
 plt.show()
