@@ -5,7 +5,7 @@
 @Author: HollisYu
 @Date: 2019-11-13 14:02:47
 @LastEditors: HollisYu
-@LastEditTime: 2019-11-26 23:00:50
+@LastEditTime: 2019-11-26 23:22:54
 '''
 import pandas as pd
 import numpy as np
@@ -159,7 +159,7 @@ def strategy(account, start_date, end_date):
 if __name__ == '__main__':
     my_account = user.User(200000.0)
     start_date = datetime.datetime.strptime("20140302", '%Y%m%d')
-    end_date = datetime.datetime.strptime("20141231", '%Y%m%d')
+    end_date = datetime.datetime.strptime("20181231", '%Y%m%d')
     result, stock_records = strategy(my_account, start_date, end_date)
 
     #画账户变化图
