@@ -1,0 +1,1 @@
+import trend_following_strategy
