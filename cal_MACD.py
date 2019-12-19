@@ -4,8 +4,8 @@
 @Version: 1.0
 @Author: HollisYu
 @Date: 2019-11-26 13:24:59
-@LastEditors: HollisYu
-@LastEditTime: 2019-11-26 21:36:10
+@LastEditors  : HollisYu
+@LastEditTime : 2019-12-19 09:53:59
 '''
 import os
 import pandas as pd
@@ -32,7 +32,7 @@ import pandas as pd
 #     return stock_data
 
 file_path = "./sh1_each_stock_data-bak/"
-result_path = "./sh1_each_stock_data/"
+result_path = "./sh1_each_stock_data2/"
 if not os.path.exists(result_path):
     os.mkdir(result_path)
 
@@ -45,6 +45,16 @@ for f in files:
     stock_data['DIF'] = stock_data['EMA12'] - stock_data['EMA26']
     stock_data['DEA'] = stock_data['DIF'].ewm(span=9).mean()
     stock_data['MACD'] = (stock_data['DIF'] - stock_data['DEA']) * 2
+
+    # cal KDJ
+    low = stock_data['LowPx'].rolling(9).min()
+    high = stock_data['HighPx'].rolling(9).max()
+
+    rsv = (stock_data['LastPx'] - low) / (high - low) * 100
+    stock_data['K'] = rsv.ewm(com=2).mean()
+    stock_data['D'] = stock_data['K'].ewm(com=2).mean()
+    stock_data['J'] = 3 * stock_data['K'] - 2 * stock_data['D']
+    
 
     stock_data.to_csv(result_path + f, index=False, header=True)
 
