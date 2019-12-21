@@ -4,8 +4,8 @@
 @Version: 1.0
 @Author: HollisYu
 @Date: 2019-11-13 14:11:22
-@LastEditors: HollisYu
-@LastEditTime: 2019-12-18 14:36:01
+@LastEditors  : HollisYu
+@LastEditTime : 2019-12-21 11:00:35
 '''
 import stock
 
@@ -14,7 +14,7 @@ class User:
         self.money = money  # cash
         self.buy_in_stocks = {} # dict of stocks have
         self.total_value = money  # all money and stock values
-        self.max_number = 10
+        self.max_number = 5
         self.up_threshold = self.total_value / self.max_number # split all money to 3 parts, change when one stock is sold
 
 
