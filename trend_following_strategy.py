@@ -203,7 +203,8 @@ def run_strategy(start_date:str, end_date:str):
 	plt.yticks(range(len(stock_set)),stock_set)
 	ax2.set_ylabel('股票代码')
 
-	plt.show()
+	#plt.show()
+	return fig, ax, fig2, ax2
 
 if __name__ == '__main__':
 	run_strategy("20140302","20140402")
