@@ -5,7 +5,7 @@
 @Author: HollisYu
 @Date: 2019-11-13 14:02:47
 @LastEditors  : HollisYu
-@LastEditTime : 2019-12-24 09:08:04
+@LastEditTime : 2019-12-24 19:08:22
 '''
 import pandas as pd
 import numpy as np
@@ -81,7 +81,6 @@ def strategy(account, start_date, end_date):
 	use_headers = ['DateTime', 'LastPx', 'Volume', 'DIF', 'DEA', 'MACD', 'K', 'D', 'J']
 
 	date = start_date
-	start_money = account.total_value
 	sh_50 = []
 	with open('./today_sh50.txt') as f:
 		line = f.readline()
@@ -226,17 +225,20 @@ def strategy(account, start_date, end_date):
 		# add one day
 		date += datetime.timedelta(days=1)
 	
-	last_record = money_records.iloc[-1]
-	alpha = (last_record['TotalMoney'] - last_record['Compare']) / start_money
-	print("Alpha rate is: {}".format(alpha))
 	return money_records, stock_records
 
-def run_strategy(start_date:str, end_date:str):
+def run_strategy(start_date: str, end_date: str):
+	start_money = 2000000.0
 	#封装main里面的函数，给前端调用
-	my_account = user.User(2000000.0)
+	my_account = user.User(start_money)
 	start_date = datetime.datetime.strptime(start_date, '%Y%m%d')
 	end_date = datetime.datetime.strptime(end_date, '%Y%m%d')
 	result, stock_records = strategy(my_account, start_date, end_date)
+
+	# cal alpha rate
+	last_record = result.iloc[-1]
+	alpha = (last_record['TotalMoney'] - last_record['Compare']) / start_money
+	print("Alpha rate is: {}".format(alpha))
 
 	#画账户变化图
 	fig, ax = plt.subplots()
@@ -280,9 +282,9 @@ def run_strategy(start_date:str, end_date:str):
 	ax2.set_ylabel('股票代码')
 
 	# plt.show()
-	return fig, ax, fig2, ax2
+	return fig, ax, fig2, ax2, alpha
 
 if __name__ == '__main__':
-	run_strategy("20190201","20191008")
+	run_strategy("20190110","20191008")
 
 	
