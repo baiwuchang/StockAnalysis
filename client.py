@@ -23,7 +23,6 @@ class Client:
 		self.cv.focus_set()
 		self.cv.create_rectangle(0,0,1600,110,fill = 'lightgray')
 
-		#还要把控件位置写成相对的，现在是写死的============================================================================！！！
 		#开始时间label
 		self.lb_start = Label(self.master, text = '开始时间', background = 'lightgray', foreground = 'black', font = ('微软雅黑',18),)
 		self.lb_start.place(x = 30, y = 30,width =200, heigh = 50)
@@ -40,8 +39,8 @@ class Client:
 		self.date_end = ttk.Entry(root, textvariable = self.date_end_str)
 		self.date_end.place(x = 700, y = 30, width = 200, heigh = 50)
 
-		#self.date_start_str.set('2014-01-02')
-		#self.date_end_str.set('2019-10-01')
+		#self.date_start_str.set('2014-03-02')
+		#self.date_end_str.set('2014-03-05')
 
 		#Calendar((x, y), 'ur').selection() 获取日期，x,y为点坐标
 		#开始时间日历函数
@@ -98,6 +97,8 @@ class Client:
 				print('del tool')
 			self.show_graph1(1)
 			self.run_first_time = 0
+			self.lb_alpha = Label(self.master, text = 'Alpha收益率：' + "%.2f%%" % (self.alpha * 100), background = 'white', foreground = 'black', font = ('微软雅黑',16),)
+			self.lb_alpha.place(x = 1200, y = 180,width =300, heigh = 30)
 
 
 
@@ -144,6 +145,8 @@ class Client:
 			self.canvas2._tkcanvas.place_forget()
 			self.toolbar2.destroy() #删除掉原来的工具栏，不然会有两个
 			self.show_graph1(1)
+			self.lb_alpha = Label(self.master, text = 'Alpha收益率：' + "%.2f%%" % (self.alpha * 100), background = 'white', foreground = 'black', font = ('微软雅黑',16),)
+			self.lb_alpha.place(x = 1200, y = 180,width =300, heigh = 30)
 	                      
 if __name__ == '__main__':
 	root = Tk()
