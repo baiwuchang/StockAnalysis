@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import stock
 import user
 from numpy import loadtxt
+import copy
 
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = 'SimHei'
@@ -254,23 +255,25 @@ def run_strategy(start_date: str, end_date: str):
 	ax.grid(True)
 
 	#先把没买过的的股票删掉
-	for i in reversed(range(len(stock_set))):
+	tmp_stock_set = copy.deepcopy(stock_set)
+
+	for i in reversed(range(len(tmp_stock_set))):
 		delete_flag = 1
 		for j in range(len(stock_records.values)):
 			if stock_records.values[j][i+1]:
 				delete_flag = 0
 				break
 		if delete_flag == 1:
-			id = stock_set[i]
-			del(stock_set[i])
+			id = tmp_stock_set[i]
+			del(tmp_stock_set[i])
 			stock_records.drop([id],axis=1,inplace=True)
 
 	#画各股票持仓甘特图
 	plt.figure(1) #另一幅图
 	fig2, ax2 = plt.subplots()
-	plt.plot(len(stock_records.values), len(stock_set)) #设置坐标轴刻度范围
+	plt.plot(len(stock_records.values), len(tmp_stock_set)) #设置坐标轴刻度范围
 	for i in range(len(stock_records.values)): #当天持有该股票的话画个点
-		for j in range(len(stock_set)):
+		for j in range(len(tmp_stock_set)):
 			if stock_records.values[i][j] == 1:
 				ax2.scatter(i,j,s = 10, c = 'r')
 	
@@ -278,7 +281,7 @@ def run_strategy(start_date: str, end_date: str):
 	ax2.set_xlabel('交易日期')
 	ax2.set_xticks(range(0, len(result['DateTime']), 10)) #显示坐标轴日期用的
 	ax2.set_xticklabels(result['DateTime'][::10], rotation=45)
-	plt.yticks(range(len(stock_set)),stock_set)
+	plt.yticks(range(len(tmp_stock_set)),tmp_stock_set)
 	ax2.set_ylabel('股票代码')
 
 	# plt.show()

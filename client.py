@@ -15,6 +15,8 @@ BG_Y = 900 #窗口高度
 class Client:
 	def __init__(self, master):
 		self.master = master
+		self.run_first_time = 1
+		self.switcher = 1
 		
 		self.cv = Canvas(self.master, width = BG_X, height = BG_Y, background = 'white')
 		self.cv.place(relx = 0.5, rely = 0.5, x = -BG_X / 2, y = -BG_Y / 2)
@@ -45,12 +47,12 @@ class Client:
 		#开始时间日历函数
 		date_start_str_gain = lambda: [
 			self.date_start_str.set(date)
-			for date in [calender.Calendar((300,300), 'ur').selection()] 
+			for date in [calender.Calendar((607,385), 'ur').selection()] 
 			if date]
 #		#结束时间日历函数
 		date_end_str_gain = lambda: [
 			self.date_end_str.set(date)
-			for date in [calender.Calendar((800,300), 'ur').selection()] 
+			for date in [calender.Calendar((1108,385), 'ur').selection()] 
 			if date]
 
 		#选择按钮
@@ -87,11 +89,17 @@ class Client:
 		#检测完毕
 
 		if can_run:
-			self.fig, self.ax, self.fig2, self.ax2= td.run_strategy(start_date, end_date) #('20141201', '20141204')
-			self.switcher = 1
+			self.fig, self.ax, self.fig2, self.ax2, self.alpha= td.run_strategy(start_date, end_date) #('20141201', '20141204')
+			if not self.run_first_time:
+				if self.switcher == 2:
+					self.switch_graph(1)
+				self.canvas1._tkcanvas.place_forget()
+				self.toolbar1.destroy() #删除掉原来的工具栏，不然会有两个
+				print('del tool')
 			self.show_graph1(1)
+			self.run_first_time = 0
 
-			
+
 
 	def check_date(self,d): #检查输入框的内容
 		if len(d) != 8:
