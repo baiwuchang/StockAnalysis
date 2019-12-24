@@ -41,6 +41,15 @@ def get_sh50_info(date: str) -> list:
 	
 	return sh_50
 
+def float_to_color(a:float):
+	#把float转化为一个红绿渐变间的数字，a从0到1,1最红,0最绿
+	r = int(a * 255)
+	g = int((1 - a) * 175)
+	rgb = [r,g,25]
+	strs = '#'
+	for i in rgb:
+		strs += str(hex(i))[-2:].replace('x','0').upper()#将R、G、B分别转化为16进制拼接转换并大写	
+	return strs
 
 def check(stock_id: str, csv_data, date, op_type: str) -> bool:
 
@@ -185,14 +194,31 @@ def strategy(account, start_date, end_date):
 							# buy no more than threshold or money have
 							money = min(account.up_threshold, account.money)
 							account.buy_stock(stock_id, today_data['LastPx'], money)
-							print("Buy stock: {} on {}".format(stock_id, dt))
+							print("Buy stock: {} on {}, price {}".format(stock_id, dt, today_data['LastPx']))
 
-							gantt_data_everyday[stock_set.index(stock_id)] = 1 #甘特图需要
+							gantt_data_everyday[stock_set.index(stock_id)] = float(today_data['LastPx']) #甘特图需要
 
 							# if already have 10 stocks, stop buying
 							if len(account.buy_in_stocks) >= account.max_number:
 								break
 							# up_signal_stocks[stock_id] = 3
+			for stock_id in sh_50:
+				# open data file
+				file_name = file_path + "ID_" + stock_id + "_Day.csv"
+				# if data not exists, skip
+				if not os.path.exists(file_name):
+					continue
+				stock_data = pd.read_csv(file_name, usecols=use_headers)
+				stock_data.set_index('DateTime', drop=False, inplace=True)
+				# get today data line
+				# if data not exists, skip
+				if dt not in stock_data.index:
+					continue
+				today_data = stock_data.loc[dt]
+
+				if not gantt_data_everyday[stock_set.index(stock_id)] == 0:
+					gantt_data_everyday[stock_set.index(stock_id)] = float(today_data['LastPx']) #甘特图需要
+
 
 					# for stock_id in up_signal_stocks:
 					# 	# open data file
@@ -268,14 +294,35 @@ def run_strategy(start_date: str, end_date: str):
 			del(tmp_stock_set[i])
 			stock_records.drop([id],axis=1,inplace=True)
 
+	#计算每支股票在持仓过程中的最高和最低值
+	gantt_max = []
+	gantt_min = []
+	gantt_dif = []
+	for j in range(len(tmp_stock_set)):
+		gantt_max.append(0)
+		gantt_min.append(10000)
+		for i in range(len(stock_records.values)): 
+			#print(stock_records.values[i][j],'============')
+			#print(type(stock_records.values[i][j]),'============')
+			if not stock_records.values[i][j + 1] == 0:
+				if stock_records.values[i][j + 1] > gantt_max[j]:
+					gantt_max[j] = stock_records.values[i][j + 1]
+				if stock_records.values[i][j + 1] < gantt_min[j]:
+					gantt_min[j] = stock_records.values[i][j + 1]
+		gantt_dif.append(gantt_max[j] - gantt_min[j])
+
+
 	#画各股票持仓甘特图
 	plt.figure(1) #另一幅图
 	fig2, ax2 = plt.subplots()
 	plt.plot(len(stock_records.values), len(tmp_stock_set)) #设置坐标轴刻度范围
-	for i in range(len(stock_records.values)): #当天持有该股票的话画个点
-		for j in range(len(tmp_stock_set)):
-			if stock_records.values[i][j] == 1:
-				ax2.scatter(i,j,s = 10, c = 'r')
+	for j in range(len(tmp_stock_set)):
+		for i in range(len(stock_records.values)): #当天持有该股票的话画个点
+			if not stock_records.values[i][j + 1] == 0:
+				c = '#FF0019'
+				if not gantt_dif[j] == 0:
+					c = float_to_color((stock_records.values[i][j + 1] - gantt_min[j]) / gantt_dif[j])
+				ax2.scatter(i,j,s = 10, c = c)
 	
 	ax2.set_title('趋势跟随策略下的股票持仓变化', fontsize=20)
 	ax2.set_xlabel('交易日期')
@@ -288,6 +335,6 @@ def run_strategy(start_date: str, end_date: str):
 	return fig, ax, fig2, ax2, alpha
 
 if __name__ == '__main__':
-	run_strategy("20190110","20191008")
+	run_strategy("20141010","20141015")
 
 	
