@@ -294,22 +294,6 @@ def run_strategy(start_date: str, end_date: str):
 			del(tmp_stock_set[i])
 			stock_records.drop([id],axis=1,inplace=True)
 
-	#计算每支股票在持仓过程中的最高和最低值
-	gantt_max = []
-	gantt_min = []
-	gantt_dif = []
-	for j in range(len(tmp_stock_set)):
-		gantt_max.append(0)
-		gantt_min.append(10000)
-		for i in range(len(stock_records.values)): 
-			#print(stock_records.values[i][j],'============')
-			#print(type(stock_records.values[i][j]),'============')
-			if not stock_records.values[i][j + 1] == 0:
-				if stock_records.values[i][j + 1] > gantt_max[j]:
-					gantt_max[j] = stock_records.values[i][j + 1]
-				if stock_records.values[i][j + 1] < gantt_min[j]:
-					gantt_min[j] = stock_records.values[i][j + 1]
-		gantt_dif.append(gantt_max[j] - gantt_min[j])
 
 
 	#画各股票持仓甘特图
@@ -317,12 +301,17 @@ def run_strategy(start_date: str, end_date: str):
 	fig2, ax2 = plt.subplots()
 	plt.plot(len(stock_records.values), len(tmp_stock_set)) #设置坐标轴刻度范围
 	for j in range(len(tmp_stock_set)):
+		buy_price = -1
 		for i in range(len(stock_records.values)): #当天持有该股票的话画个点
 			if not stock_records.values[i][j + 1] == 0:
-				c = '#FF0019'
-				if not gantt_dif[j] == 0:
-					c = float_to_color((stock_records.values[i][j + 1] - gantt_min[j]) / gantt_dif[j])
-				ax2.scatter(i,j,s = 10, c = c)
+				if buy_price == -1:
+					buy_price = stock_records.values[i][j + 1]
+				if stock_records.values[i][j + 1] >= buy_price:
+					ax2.scatter(i,j,s = 10, c = 'r')
+				else:
+					ax2.scatter(i,j,s = 10, c = 'g')
+			else:
+				buy_price = -1
 	
 	ax2.set_title('趋势跟随策略下的股票持仓变化', fontsize=20)
 	ax2.set_xlabel('交易日期')
