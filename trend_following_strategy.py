@@ -5,7 +5,7 @@
 @Author: HollisYu
 @Date: 2019-11-13 14:02:47
 @LastEditors  : HollisYu
-@LastEditTime : 2019-12-21 10:57:35
+@LastEditTime : 2019-12-24 09:08:04
 '''
 import pandas as pd
 import numpy as np
@@ -81,6 +81,7 @@ def strategy(account, start_date, end_date):
 	use_headers = ['DateTime', 'LastPx', 'Volume', 'DIF', 'DEA', 'MACD', 'K', 'D', 'J']
 
 	date = start_date
+	start_money = account.total_value
 	sh_50 = []
 	with open('./today_sh50.txt') as f:
 		line = f.readline()
@@ -225,6 +226,9 @@ def strategy(account, start_date, end_date):
 		# add one day
 		date += datetime.timedelta(days=1)
 	
+	last_record = money_records.iloc[-1]
+	alpha = (last_record['TotalMoney'] - last_record['Compare']) / start_money
+	print("Alpha rate is: {}".format(alpha))
 	return money_records, stock_records
 
 def run_strategy(start_date:str, end_date:str):
@@ -236,7 +240,8 @@ def run_strategy(start_date:str, end_date:str):
 
 	#画账户变化图
 	fig, ax = plt.subplots()
-	for label in ['TotalMoney', 'Cash', 'Stocks', 'Compare']: 
+	# for label in ['TotalMoney', 'Cash', 'Stocks', 'Compare']: 
+	for label in ['TotalMoney', 'Compare']:
 		ax.plot(result[label], label=label)
 	ax.set_title('趋势跟随策略下的账户变化', fontsize=20)
 	ax.set_xlabel('交易日期')
@@ -274,10 +279,10 @@ def run_strategy(start_date:str, end_date:str):
 	plt.yticks(range(len(stock_set)),stock_set)
 	ax2.set_ylabel('股票代码')
 
-	#plt.show()
+	# plt.show()
 	return fig, ax, fig2, ax2
 
 if __name__ == '__main__':
-	run_strategy("20190101","20191008")
+	run_strategy("20190201","20191008")
 
 	
