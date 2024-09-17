@@ -4,22 +4,23 @@
 @Version: 1.0
 @Author: HollisYu
 @Date: 2019-11-13 14:11:22
-@LastEditors: HollisYu
-@LastEditTime: 2019-11-21 23:17:18
+@LastEditors  : HollisYu
+@LastEditTime : 2019-12-21 11:00:35
 '''
 import stock
 
 class User:
-    def __init__(self, money:float):
+    def __init__(self, money: float):
         self.money = money  # cash
         self.buy_in_stocks = {} # dict of stocks have
         self.total_value = money  # all money and stock values
-        self.up_threshold = self.total_value / 10 # split all money to 10 parts, change when one stock is sold
+        self.max_number = 5
+        self.up_threshold = self.total_value / self.max_number # split all money to 3 parts, change when one stock is sold
 
 
-    def buy_stock(self, stock_id:str, buying_price:float, money: float):
+    def buy_stock(self, stock_id: str, buying_price: float, money: float):
         # more than 10 stocks already have, stop buy in
-        if len(self.buy_in_stocks) >= 10:
+        if len(self.buy_in_stocks) >= self.max_number:
             return
 
         fee = self.calculate_fee(money, "buy")
@@ -30,7 +31,7 @@ class User:
         self.money = self.money - money
         
 
-    def sell_stock(self, stock_id:str):
+    def sell_stock(self, stock_id: str):
         # if dont have, return
         if stock_id not in self.buy_in_stocks.keys():
             return
@@ -44,7 +45,7 @@ class User:
         self.money = self.money + volume - fee
 
         # re-cal the split money
-        self.up_threshold = self.total_value / 10
+        self.up_threshold = self.total_value / self.max_number
 
 
     def update_stock(self, stock_id: str, now_price: float):

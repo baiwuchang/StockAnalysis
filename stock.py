@@ -5,7 +5,7 @@
 @Author: HollisYu
 @Date: 2019-11-11 09:59:56
 @LastEditors: HollisYu
-@LastEditTime: 2019-11-20 16:37:33
+@LastEditTime: 2019-12-18 15:47:58
 '''
 class Stock:
     def __init__(self, stock_id: str, buying_price: float, shares: float):
@@ -17,6 +17,7 @@ class Stock:
 
         self.now_price = buying_price  # stock now price, change everyday
         self.total_value = self.total_cost  # stock now value, equal to now_price * shares
+        self.profit = 0.0   # store profit percentage
 
 
     # def buy(self, buying_price: float, shares: float):
@@ -48,3 +49,4 @@ class Stock:
     def update(self, now_price: float):
         self.now_price = now_price
         self.total_value = self.now_price * self.shares
+        self.profit = (self.total_value - self.total_cost) / self.total_cost
